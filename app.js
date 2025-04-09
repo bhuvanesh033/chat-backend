@@ -1,8 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const sequelize = require('./config/database');
+const cors = require('cors');
 require("dotenv").config();
 
+const sequelize = require('./config/database');
 
 // Import models
 const User = require('./models/user');
@@ -27,20 +28,12 @@ const corsOptions = {
 };
 
 // Use CORS middleware
-const cors = require('cors');
-// app.use(cors(corsOptions));
-app.use(cors({
-    origin: 'http://localhost:5173', // React app URL
-    methods: ['GET', 'POST'], // Allowed methods
-    allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
-    credentials: true, // Allow cookies
-  }));
+app.use(cors(corsOptions));
 
 // Middleware to parse JSON bodies
 app.use(bodyParser.json());
 
 // Define relationships
-// Define relationships in your app.js
 
 // User has many Messages, based on sender_number
 User.hasMany(Message, { foreignKey: 'sender_number', sourceKey: 'phone_number' });
@@ -53,15 +46,12 @@ Conversation.hasMany(Participant, { foreignKey: 'convo_id' });
 Participant.belongsTo(User, { foreignKey: 'phone_number' });
 Participant.belongsTo(Conversation, { foreignKey: 'convo_id' });
 
-// Fix the association between Message and User. Use only one alias.
+// Message belongs to User (sender)
 Message.belongsTo(User, { foreignKey: 'sender_number', as: 'sender' }); 
-// Use alias 'sender' only once
 
-// Conversation has two separate Participant associations
+// Conversation has two separate Participant associations (with aliases)
 Conversation.hasMany(Participant, { foreignKey: 'convo_id', as: 'MyParticipant' });
 Conversation.hasMany(Participant, { foreignKey: 'convo_id', as: 'OtherParticipant' });
-
-
 
 // Use routes
 app.use('/api/ai', aiRoutes);
@@ -78,12 +68,5 @@ app.use((req, res, next) => {
 // Handle preflight requests (OPTIONS method)
 app.options('*', cors(corsOptions));
 
-// Sync database and start server
-sequelize.sync({ alter: true, logging: console.log })
-    .then(() => {
-        console.log('Database synced and altered successfully');
-        app.listen(5000, () => {
-            console.log('Server running on port 5000');
-        });
-    })
-    .catch(err => console.log('Error syncing database:', err));
+// Export the configured Express app (without starting the server)
+module.exports = app;
