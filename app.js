@@ -1,6 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const sequelize = require('./config/database');
+require("dotenv").config();
+
 
 // Import models
 const User = require('./models/user');
@@ -9,6 +11,7 @@ const Participant = require('./models/participant');
 const Message = require('./models/message');
 
 // Import routes
+const aiRoutes = require('./routes/aiRoutes');
 const userRoutes = require('./routes/userRoutes');
 const conversationRoutes = require('./routes/conversationRoutes');
 const messageRoutes = require('./routes/messageRoutes'); // Import the message routes
@@ -61,6 +64,7 @@ Conversation.hasMany(Participant, { foreignKey: 'convo_id', as: 'OtherParticipan
 
 
 // Use routes
+app.use('/api/ai', aiRoutes);
 app.use('/', userRoutes);
 app.use('/conversations', conversationRoutes);
 app.use('/messages', messageRoutes); // Add message routes
