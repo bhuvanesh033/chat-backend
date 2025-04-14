@@ -21,7 +21,7 @@ const User = sequelize.define('User', {
         type: DataTypes.TEXT
     },
     profile: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(255),
         allowNull: false
     }
 }, {

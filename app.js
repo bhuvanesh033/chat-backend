@@ -58,6 +58,8 @@ app.use('/api/ai', aiRoutes);
 app.use('/', userRoutes);
 app.use('/conversations', conversationRoutes);
 app.use('/messages', messageRoutes); // Add message routes
+app.use('/uploads', express.static('uploads'));
+
 
 // Logging middleware
 app.use((req, res, next) => {

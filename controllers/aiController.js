@@ -16,7 +16,7 @@ exports.askAI = async (req, res) => {
       },
       {
         headers: {
-          'Authorization': `Bearer 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`,
+          'Authorization': `Bearer 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`,
           'Content-Type': 'application/json'
         }
       }
@@ -50,7 +50,7 @@ exports.smartSuggestions = async (req, res) => {
         },
         {
           headers: {
-            'Authorization': `Bearer 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`,
+            'Authorization': `Bearer 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`,
             'Content-Type': 'application/json'
           }
         }
