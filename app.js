@@ -21,7 +21,7 @@ const app = express();
 
 // CORS configuration
 const corsOptions = {
-  origin: 'http://localhost:5173', // React app's URL (without trailing slash)
+  origin: true, // React app's URL (without trailing slash)
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Specify allowed methods
   allowedHeaders: ['Content-Type', 'Authorization'], // Specify allowed headers
   credentials: true, // Allow credentials (cookies, authentication headers)
