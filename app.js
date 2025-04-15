@@ -42,6 +42,7 @@ User.hasMany(Message, { foreignKey: 'sender_number', sourceKey: 'phone_number' }
 Conversation.hasMany(Message, { foreignKey: 'convo_id' });
 Conversation.hasMany(Participant, { foreignKey: 'convo_id' });
 
+
 // Participant belongs to both User and Conversation
 Participant.belongsTo(User, { foreignKey: 'phone_number' });
 Participant.belongsTo(Conversation, { foreignKey: 'convo_id' });
@@ -52,6 +53,10 @@ Message.belongsTo(User, { foreignKey: 'sender_number', as: 'sender' });
 // Conversation has two separate Participant associations (with aliases)
 Conversation.hasMany(Participant, { foreignKey: 'convo_id', as: 'MyParticipant' });
 Conversation.hasMany(Participant, { foreignKey: 'convo_id', as: 'OtherParticipant' });
+
+User.hasMany(Participant, { foreignKey: 'phone_number', sourceKey: 'phone_number' });
+Participant.belongsTo(User, { foreignKey: 'phone_number', targetKey: 'phone_number' });
+
 
 // Use routes
 app.use('/api/ai', aiRoutes);

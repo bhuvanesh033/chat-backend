@@ -191,46 +191,126 @@ exports.createGroupChat = async (req, res) => {
 //     }
 //   };
   
+// exports.getIndividualChats = async (req, res) => {
+//     try {
+//       const phoneNumber = req.user.phone_number;
+  
+//       const individualChats = await Conversation.findAll({
+//         where: {
+//           is_group: false,
+//         },
+//         include: [
+//           {
+//             model: Participant,
+//             as: 'MyParticipant',
+//             where: { phone_number: phoneNumber },
+//             attributes: [], // We don't need self data
+//           },
+//           {
+//             model: Participant,
+//             as: 'OtherParticipant',
+//             where: {
+//               phone_number: { [Op.ne]: phoneNumber },
+//             },
+//             include: {
+//               model: User,
+//               attributes: ['name', 'phone_number'],
+//             },
+//           },
+//           {
+//             model: Message,
+//             limit: 1,
+//             order: [['timestamp', 'DESC']],
+//           },
+//         ],
+//       });
+  
+//       res.json(individualChats);
+//     } catch (err) {
+//       console.error(err);
+//       res.status(500).json({ error: 'Error fetching individual chats' });
+//     }
+//   };
+
+// exports.getIndividualChats = async (req, res) => {
+//   try {
+//     const phoneNumber = req.user.phone_number;
+
+//     const individualChats = await Conversation.findAll({
+//       where: {
+//         is_group: false,
+//       },
+//       attributes: ['id', 'timestamp', 'image'], // Include image explicitly
+//       include: [
+//         {
+//           model: Participant,
+//           as: 'MyParticipant',
+//           where: { phone_number: phoneNumber },
+//           attributes: [], // Don’t return this participant
+//         },
+//         {
+//           model: Participant,
+//           as: 'OtherParticipant',
+//           where: {
+//             phone_number: { [Op.ne]: phoneNumber },
+//           },
+//           include: {
+//             model: User,
+//             attributes: ['name', 'phone_number'],
+//           },
+//         },
+//         {
+//           model: Message,
+//           limit: 1,
+//           order: [['timestamp', 'DESC']],
+//         },
+//       ],
+//     });
+
+//     res.json(individualChats);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: 'Error fetching individual chats' });
+//   }
+// };
 exports.getIndividualChats = async (req, res) => {
-    try {
-      const phoneNumber = req.user.phone_number;
-  
-      const individualChats = await Conversation.findAll({
-        where: {
-          is_group: false,
-        },
-        include: [
-          {
-            model: Participant,
-            as: 'MyParticipant',
-            where: { phone_number: phoneNumber },
-            attributes: [], // We don't need self data
+  const loggedInUserPhone = req.user.phone_number; // from your JWT auth middleware
+
+  try {
+    const conversations = await Conversation.findAll({
+      where: { is_group: false },
+      include: [
+        {
+          model: Participant,
+          as: 'OtherParticipant',
+          where: {
+            phone_number: { [Op.ne]: loggedInUserPhone } // only include other participant
           },
-          {
-            model: Participant,
-            as: 'OtherParticipant',
-            where: {
-              phone_number: { [Op.ne]: phoneNumber },
-            },
-            include: {
+          include: [
+            {
               model: User,
-              attributes: ['name', 'phone_number'],
-            },
-          },
-          {
-            model: Message,
-            limit: 1,
-            order: [['timestamp', 'DESC']],
-          },
-        ],
-      });
-  
-      res.json(individualChats);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Error fetching individual chats' });
-    }
-  };
+              attributes: ['name', 'phone_number', 'profile']
+            }
+          ]
+        },
+        {
+          model: Message,
+          limit: 1,
+          order: [['timestamp', 'DESC']],
+          separate: true
+        }
+      ],
+      order: [['timestamp', 'DESC']]
+    });
+
+    res.status(200).json(conversations);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to fetch conversations' });
+  }
+};
+
+
 
   exports.getGroupChats = async (req, res) => {
     try {

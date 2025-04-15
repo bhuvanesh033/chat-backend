@@ -3,12 +3,61 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const path = require('path');
 const fs = require('fs');
+const cloudinary = require('cloudinary').v2;
+
+
+cloudinary.config({
+    cloud_name: 'da13bjvgn',
+    api_key: '656142423213844',
+    api_secret: 'BKXOxuwwygFRZTfcPs4kmVvBmvo',
+});
 
 // Create a new user
+// exports.createUser = async (req, res) => {
+//     try {
+//         const { name, password, description, phone_number } = req.body;
+//         const profile = req.file ? req.file.filename : null;
+
+//         // Hash the password
+//         const hashedPassword = await bcrypt.hash(password, 10);
+
+//         // Create the user
+//         const user = await User.create({
+//             name,
+//             password: hashedPassword,
+//             description,
+//             profile,
+//             phone_number,
+//         });
+
+//         res.status(201).json({ 
+//             message: "User created successfully", 
+//             user: {
+//                 id: user.id,
+//                 name: user.name,
+//                 phone_number: user.phone_number,
+//                 profile: user.profile
+//             } 
+//         });
+//     } catch (error) {
+//         // Clean up uploaded file if user creation fails
+//         if (req.file) {
+//             fs.unlinkSync(path.join('uploads', req.file.filename));
+//         }
+//         console.error("Error in createUser:", error.message);
+//         res.status(400).json({ error: error.message });
+//     }
+// };
 exports.createUser = async (req, res) => {
     try {
         const { name, password, description, phone_number } = req.body;
-        const profile = req.file ? req.file.filename : null;
+
+        // Upload profile image to Cloudinary
+        let profileUrl = null;
+        if (req.file) {
+            const result = await cloudinary.uploader.upload(req.file.path);
+            profileUrl = result.secure_url; // Get the URL of the uploaded image
+        }
 
         // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -18,29 +67,28 @@ exports.createUser = async (req, res) => {
             name,
             password: hashedPassword,
             description,
-            profile,
+            profile: profileUrl,
             phone_number,
         });
 
-        res.status(201).json({ 
-            message: "User created successfully", 
+        res.status(201).json({
+            message: "User created successfully",
             user: {
                 id: user.id,
                 name: user.name,
                 phone_number: user.phone_number,
                 profile: user.profile
-            } 
+            }
         });
     } catch (error) {
         // Clean up uploaded file if user creation fails
         if (req.file) {
-            fs.unlinkSync(path.join('uploads', req.file.filename));
+            fs.unlinkSync(path.join('uploads', req.file.filename)); // Clean local file if error occurs
         }
         console.error("Error in createUser:", error.message);
         res.status(400).json({ error: error.message });
     }
 };
-
 // Login a user
 exports.loginUser = async (req, res) => {
     const { phone_number, password } = req.body;
