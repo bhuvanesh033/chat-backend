@@ -1,5 +1,7 @@
 // controllers/aiController.js
 const axios = require('axios');
+require('dotenv').config();
+
 
 exports.askAI = async (req, res) => {
   try {
@@ -16,7 +18,7 @@ exports.askAI = async (req, res) => {
       },
       {
         headers: {
-          'Authorization': `Bearer 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`,
+          'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
           'Content-Type': 'application/json'
         }
       }
@@ -50,7 +52,7 @@ exports.smartSuggestions = async (req, res) => {
         },
         {
           headers: {
-            'Authorization': `Bearer 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`,
+            'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
             'Content-Type': 'application/json'
           }
         }
