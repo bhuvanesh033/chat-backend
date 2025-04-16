@@ -273,8 +273,45 @@ exports.createGroupChat = async (req, res) => {
 //     res.status(500).json({ error: 'Error fetching individual chats' });
 //   }
 // };
+// exports.getIndividualChats = async (req, res) => {
+//   const loggedInUserPhone = req.user.phone_number; // from your JWT auth middleware
+
+//   try {
+//     const conversations = await Conversation.findAll({
+//       where: { is_group: false },
+//       include: [
+//         {
+//           model: Participant,
+//           as: 'OtherParticipant',
+//           where: {
+//             phone_number: { [Op.ne]: loggedInUserPhone } // only include other participant
+//           },
+//           include: [
+//             {
+//               model: User,
+//               attributes: ['name', 'phone_number', 'profile']
+//             }
+//           ]
+//         },
+//         {
+//           model: Message,
+//           limit: 1,
+//           order: [['timestamp', 'DESC']],
+//           separate: true
+//         }
+//       ],
+//       order: [['timestamp', 'DESC']]
+//     });
+
+//     res.status(200).json(conversations);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: 'Failed to fetch conversations' });
+//   }
+// };
+
 exports.getIndividualChats = async (req, res) => {
-  const loggedInUserPhone = req.user.phone_number; // from your JWT auth middleware
+  const loggedInUserPhone = req.user.phone_number;
 
   try {
     const conversations = await Conversation.findAll({
@@ -282,9 +319,17 @@ exports.getIndividualChats = async (req, res) => {
       include: [
         {
           model: Participant,
-          as: 'OtherParticipant',
+          as: 'MyParticipant', // Ensures logged-in user is part of the convo
           where: {
-            phone_number: { [Op.ne]: loggedInUserPhone } // only include other participant
+            phone_number: loggedInUserPhone
+          },
+          attributes: [] // We don't need data from this include
+        },
+        {
+          model: Participant,
+          as: 'OtherParticipant', // Fetch the other user in the convo
+          where: {
+            phone_number: { [Op.ne]: loggedInUserPhone }
           },
           include: [
             {
@@ -309,7 +354,6 @@ exports.getIndividualChats = async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch conversations' });
   }
 };
-
 
 
   exports.getGroupChats = async (req, res) => {
