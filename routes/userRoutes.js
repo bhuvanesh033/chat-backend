@@ -3,6 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const { createUser, loginUser } = require('../controllers/userController');
 const { validateUser } = require('../middlewares/userValidation');
+const { logoutUser } = require('../controllers/userController');
 
 // Use multer memory storage (no file saved to disk)
 const storage = multer.memoryStorage();
@@ -20,5 +21,5 @@ const upload = multer({
 
 router.post('/create', upload.single('profile'), validateUser, createUser);
 router.post('/login', loginUser);
-
+router.post('/logout', logoutUser);
 module.exports = router;

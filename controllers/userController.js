@@ -114,3 +114,10 @@ exports.loginUser = async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 };
+
+// In your userController.js or a separate controller
+exports.logoutUser = (req, res) => {
+    // Invalidate the session or token if needed (you can implement token blacklist if required)
+    // For this case, just sending a response to remove the token on the client side.
+    res.status(200).json({ message: 'Logout successful' });
+};
