@@ -95,6 +95,7 @@ exports.loginUser = async (req, res) => {
                 id: user.id,
                 name: user.name,
                 phone_number: user.phone_number,
+                profile: user.profile
             },
             process.env.JWT_SECRET || 'yourSecretKey',
             { expiresIn: '24h' }
